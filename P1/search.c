@@ -4,9 +4,7 @@
 #include<errno.h>
 #include<limits.h>
 extern int errno;
-//this is a branch
-//HI i am lenovo XD
-//This beter work
+
 struct save{
 int files;
 int index[files];
