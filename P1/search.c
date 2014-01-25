@@ -6,7 +6,7 @@
 extern int errno;
 
 //HI i am lenovo XD
-
+//This beter work
 struct save{
 int files;
 int index[files];
