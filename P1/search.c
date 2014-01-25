@@ -6,9 +6,9 @@
 extern int errno;
 
 struct save{
-int files;
-int index[files];
-int counta[files];
+int index;
+int counta;
+
 };
 
 
@@ -33,9 +33,6 @@ int main(int argc, char *argv[])    // MAIN
 int nfile;
 char buf[PATH_MAX + 1];
 
-struct save sav;
-
-
 
 char buf2[PATH_MAX + 1];
  if (argc>0)             //get number files
@@ -44,27 +41,37 @@ char buf2[PATH_MAX + 1];
  {
  nfile=0;}
 
+struct save sav[nfile];
+
 int temp= 3+ nfile + 1;
 
  if((argc == temp || argc == temp-1))   // CORRECT NUMBER OF ARGUMENTS CASE
  { 
     int i;
     if(argv[temp-1])              // Check if any input file is same as output file
-     { 
-       // char *res=realpath(argv[temp-1],buf);
+     {
+
+       FILE *f=fopen(argv[temp-1],"r");
+   
+       if(errno!=0)
+         {
+         fprintf(stderr,"Error: Cannot open file 'input.txt'\n");
+         exit(1);
+         }
+
       for(i=0; i<nfile;i++)
  	{
-	  
-//	 if(strcmp(argv[3+i], argv[temp-1]) == 0)
          if(strcmp((realpath(argv[3+i],buf2)),(realpath(argv[temp-1],buf))) == 0)
             {
                     fprintf(stderr, "Input and output file must differ\n");
 		     exit(1);
                      }
 	}
+
+        fclose(f);
      }
     
-sav.files=nfile;
+
 // all condition satisfied so start
 int val;
 int val2= 2+ nfile;
@@ -97,15 +104,72 @@ int val2= 2+ nfile;
 	int counter;
 
 	counter= count(f1,argv[2]);
+        sav[val-3].index=val;
+        sav[val-3].counta=counter;
         
-	printf("%s =  %d\n",argv[val],counter);
+//	printf("%s =  %d\n",argv[val],counter);
 	fclose(file);
 }
 
+int j;
+int k;
 
-	 }
+for(k=0;k<nfile;k++)
+{
+  for(j=0;j<nfile-1;j++)
+  {   
+    if( (sav[j].counta) < (sav[j+1].counta))
+    {
+      int temp= sav[j+1].counta;
+      sav[j+1].counta = sav[j].counta;
+       sav[j].counta=temp;
 
- else                                 //WRONG NUMBER OF ARGUMENTS CASE
+       int temp2= sav[j+1].index;
+      sav[j+1].index = sav[j].index;
+       sav[j].index=temp2;
+    
+    }
+  }
+}
+
+  if(argv[temp-1]) 
+  {
+
+  FILE *f=fopen(argv[temp-1],"w");
+  
+  if(errno!=0)
+  {
+   fprintf(stderr,"Error: Cannot open file 'input.txt'\n");
+   exit(1);
+   }
+
+  int l;
+  for(l=0;l<nfile;l++)
+  {
+  fprintf(f,"%d %s\n",(sav[l].counta), (argv[(sav[l].index)]));
+  }
+     fclose(f);
+  }
+
+  else  
+  {
+  int m;  
+   for(m=0;m<nfile;m++)
+   {
+   printf("%d %s\n",(sav[m].counta), (argv[(sav[m].index)]));
+   }
+  }
+
+
+}
+
+	 
+
+
+
+
+
+else                                 //WRONG NUMBER OF ARGUMENTS CASE
  {                    
  printf("Usage: search <input-number> <key-word> <input-list> <output>\n");
  exit(1);
