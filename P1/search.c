@@ -4,7 +4,7 @@
 #include<errno.h>
 #include<limits.h>
 extern int errno;
-//this is abranch
+//this is a branch
 //HI i am lenovo XD
 //This beter work
 struct save{
