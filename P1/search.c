@@ -32,10 +32,10 @@ int main(int argc, char *argv[])    // MAIN
 {
 int nfile;
 char buf[PATH_MAX + 1];
-
+FILE *f2;
 
 char buf2[PATH_MAX + 1];
- if (argc>0)             //get number files
+ if (argc>0)     //CHeck this part it should probably be argc>1                    //get number files
  {nfile= atoi(argv[1]);}
  else
  {
@@ -51,7 +51,7 @@ int temp= 3+ nfile + 1;
     if(argv[temp-1])              // Check if any input file is same as output file
      {
 
-       FILE *f=fopen(argv[temp-1],"r");
+       f2=fopen(argv[temp-1],"a");
    
        if(errno!=0)
          {
@@ -68,7 +68,7 @@ int temp= 3+ nfile + 1;
                      }
 	}
 
-        fclose(f);
+        fclose(f2);
      }
     
 
@@ -135,7 +135,7 @@ for(k=0;k<nfile;k++)
   if(argv[temp-1]) 
   {
 
-  FILE *f=fopen(argv[temp-1],"w");
+  f2=fopen(argv[temp-1],"w");
   
   if(errno!=0)
   {
@@ -146,9 +146,9 @@ for(k=0;k<nfile;k++)
   int l;
   for(l=0;l<nfile;l++)
   {
-  fprintf(f,"%d %s\n",(sav[l].counta), (argv[(sav[l].index)]));
+  fprintf(f2,"%d %s\n",(sav[l].counta), (argv[(sav[l].index)]));
   }
-     fclose(f);
+     fclose(f2);
   }
 
   else  
