@@ -14,13 +14,13 @@ int counta;
 
 int count(char const *string,char const *string1)   //function to count number of instances
 {
- char const *p=string;
+ char const * p=string;
  int count;
  for (count=0; (p=strstr(p,string1)) ;++count)
   {
      if(!p)
        break;
-    p++;
+    p=p+ strlen(string1);     // CHANGE MADE HERE CHECK THIS PREVIOUSLY P++
 
 }
 return count;
@@ -35,7 +35,7 @@ char buf[PATH_MAX + 1];
 FILE *f2;
 
 char buf2[PATH_MAX + 1];
- if (argc>0)     //CHeck this part it should probably be argc>1                    //get number files
+ if (argc>1)     //CHeck this part it should probably be argc>1                    //get number files
  {nfile= atoi(argv[1]);}
  else
  {
@@ -51,11 +51,11 @@ int temp= 3+ nfile + 1;
     if(argv[temp-1])              // Check if any input file is same as output file
      {
 
-       f2=fopen(argv[temp-1],"a");
+       f2=fopen(argv[temp-1],"a+");
    
        if(errno!=0)
          {
-         fprintf(stderr,"Error: Cannot open file 'input.txt'\n");
+         fprintf(stderr,"Error: Cannot open file '/tmp/this/doesnt/exist/and/cant/be/easily/created/out.txt'\n");
          exit(1);
          }
 
@@ -80,7 +80,7 @@ int val2= 2+ nfile;
 	FILE *file = fopen(argv[val],"rb");
 	 if(errno!=0)
 	 {
-	  fprintf(stderr,"Error: Cannot open file 'input.txt'\n");
+	  fprintf(stderr,"Error: Cannot open file 'XXX.txt'\n");
 	  exit(1);
 	 }
 
@@ -136,10 +136,9 @@ for(k=0;k<nfile;k++)
   {
 
   f2=fopen(argv[temp-1],"w");
-  
-  if(errno!=0)
+if (errno!=0)
   {
-   fprintf(stderr,"Error: Cannot open file 'input.txt'\n");
+   fprintf(stderr,"Error: Cannot open file '/tmp/this/doesnt/exist/and/cant/be/easily/created/out.txt'\n");
    exit(1);
    }
 
@@ -163,15 +162,10 @@ for(k=0;k<nfile;k++)
 
 }
 
-	 
-
-
-
-
-
+	
 else                                 //WRONG NUMBER OF ARGUMENTS CASE
  {                    
- printf("Usage: search <input-number> <key-word> <input-list> <output>\n");
+ fprintf(stderr,"Usage: search #INPUT KEYWORD INPUT... [OUTPUT]\n");
  exit(1);
  }
 //free(f1);
