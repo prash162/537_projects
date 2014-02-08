@@ -55,7 +55,7 @@ int temp= 3+ nfile + 1;
    
        if(errno!=0)
          {
-         fprintf(stderr,"Error: Cannot open file '/tmp/this/doesnt/exist/and/cant/be/easily/created/out.txt'\n");
+         fprintf(stderr,"Error: Cannot open file '%s'\n",argv[temp-1]);
          exit(1);
          }
 
@@ -80,7 +80,7 @@ int val2= 2+ nfile;
 	FILE *file = fopen(argv[val],"rb");
 	 if(errno!=0)
 	 {
-	  fprintf(stderr,"Error: Cannot open file 'XXX.txt'\n");
+	  fprintf(stderr,"Error: Cannot open file '%s'\n",argv[val]);
 	  exit(1);
 	 }
 
@@ -138,7 +138,7 @@ for(k=0;k<nfile;k++)
   f2=fopen(argv[temp-1],"w");
 if (errno!=0)
   {
-   fprintf(stderr,"Error: Cannot open file '/tmp/this/doesnt/exist/and/cant/be/easily/created/out.txt'\n");
+   fprintf(stderr,"Error: Cannot open file '%s'\n",argv[temp-1]);
    exit(1);
    }
 
@@ -165,7 +165,7 @@ if (errno!=0)
 	
 else                                 //WRONG NUMBER OF ARGUMENTS CASE
  {                    
- fprintf(stderr,"Usage: search #INPUT KEYWORD INPUT... [OUTPUT]\n");
+ fprintf(stderr,"Usage: search <input-number> <key-word> <input-list> <output>\n");
  exit(1);
  }
 //free(f1);
