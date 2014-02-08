@@ -11,10 +11,7 @@ char error_message[30] = "An error has occurred\n";
 write(STDERR_FILENO, error_message, strlen(error_message));
 }
 
-void quit()      // quit function
-{
-exit(0);
-}
+
 
 void pwd()
 {
@@ -24,37 +21,52 @@ path=getcwd(path,256);
 printf("%s\n",path);
 }
 
-void cd()
+void cd(char* argv[])
 {
-char *env = (char*)malloc(8);
-env=getenv("HOME");  
-int w;
-w=chdir(env);
-if(w==-1)
+char *env = (char*)malloc(256);
+  if (env==NULL)
   {
   error();
   }
 
+if(argv[1]==NULL)
+{env=getenv("HOME");  }
+
+else
+{
+
+  strcpy(env,argv[1]);
+ // strncpy(env,argv[1],(strlen(argv[1])-1));
 }
+
+int w;
+w=chdir(env);
+
+if(w==-1)
+  {
+  error();
+  }
+}
+
+
 
 
 int main(int argc , char *argv[])   // main
 {
 
-int id =fork(); 
+
 
 while(1)
 {
   
-  if (id==0) //child
-  {
-  printf("537sh> "); 
+   
+ printf("537sh> "); 
   char* parse;
   parse=(char*)malloc(512*(sizeof(char)));
-      if (parse==NULL)
-      {error();}
+  if (parse==NULL)
+  {error();}
    
-    parse=fgets(parse,512,stdin);  
+parse=fgets(parse,512,stdin);  
   
 char const* p=parse;
 char const* q=parse;
@@ -75,53 +87,75 @@ for(k=0;(k<(strlen(parse)+1));k++)                            // To find number 
     q++;
 }
 count++;
-printf(" the number of arguments are %d\n",count);             // 
+ 
+char* argv[8];
 
 
+char * parse2=malloc(512);
+parse2=strncpy(parse2,parse,(strlen(parse)-1));
 
-
-
-
-tok=strtok(parse," ");   // Actual parsing to find arguments
-while(tok!=NULL)    
+if((strchr(parse2,';')==NULL ) || (strchr(parse2,'+')==NULL ))
 {
-tok=strtok(NULL," ");
-}                          //           
+  int l=0;
+  tok=strtok(parse2," ");   // Actual parsing to find arguments
 
+  while(tok!=NULL)    
+  {
+   // printf("%s\n",tok);
+  argv[l]=strdup(tok);
+  tok=strtok(NULL," ");
+  l++;
+    }
+  argv[l]=NULL;
+} 
+  
+  int id;      
 
+   
+         //   id =fork();
 
-
-
-
-    
-    if(parse==NULL)
-          {error();}
-
-       if(strncmp(parse,"quit",4) ==0)
-      {
-       quit();
-      }
-      else if(strncmp(parse,"pwd",3)==0)
-      {
-      pwd();
-      }
-     
-       else if(strncmp(parse,"cd",2)==0)
+  
+   if(strncmp(argv[0],"quit",4) ==0)   // issue with quit have to give it twice sometimes
        {
-       cd();
-       }
 
+          exit(0);      
+        }
 
+   else 
+       {      
+         id=fork();
+              if(id==0)//child
+                    {         
+                            
+                         if(strncmp(argv[0],"pwd",3)==0)
+                             {
+                                   pwd();
+                              }
+     
+                          else if(strncmp(argv[0],"cd",2)==0)
+                             {
+                                cd(argv);
+                             }
+ 
+                             else
+                                {   
+                              execvp(argv[0],argv);
+                                 error();
+                                }
+                     } 
 
+                else if(id>0) //parent
+                   {
+                  
+                        pid_t status;
+                    while(waitpid(0,&status,0)!=id);
+                    
+               //    while( waitpid(0, &status, WEXITED)!=id);
+                   }
+               else
+                 {  error();}
 
-  }
-
-  else if(id>0) //parent
-  {(void)wait(NULL);
-    break;
-  }
-  else
-  {error();}
+         }           
 }
 return 0;
 }
