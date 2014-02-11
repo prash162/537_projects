@@ -53,7 +53,7 @@ if(w==-1)
 
 int main(int argc , char *argv[])   // main
 {
-
+int id=0;
 while(1)
 {
    
@@ -165,10 +165,10 @@ while(nm<=(count-1) )
     }
   argv[l]=NULL;
 }
-printf("%s\n",parse);
+//printf("%s\n",parse);
 
   
-  int id;      
+      
  
    if(strncmp(argv[0],"quit",4) ==0)   // issue with quit have to give it twice sometimes
        {
@@ -201,10 +201,15 @@ else
                   
                         pid_t status;
                       
-                     //   if()
+                        if((strchr(parse,'+')==NULL))
                         {while(waitpid(0,&status,0)!=id);}
+                        
                       nm++;        
-                    continue;
+                    
+                    
+           //         continue;
+                      
+
                    }
                else
                  { 
@@ -214,8 +219,11 @@ else
         }
   
   }
-
-  printf("========\n");
-}
+pid_t status;
+if((strchr(parse,'+')!=NULL))
+{while(waitpid(0,&status,0)!=id);}
+  // printf("========\n");
+//continue;
+   }
 return 0;
 }
