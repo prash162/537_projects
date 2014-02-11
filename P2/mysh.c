@@ -165,7 +165,7 @@ while(nm<=(count-1) )
     }
   argv[l]=NULL;
 }
-
+printf("%s\n",parse);
 
   
   int id;      
@@ -201,7 +201,8 @@ else
                   
                         pid_t status;
                       
-                    while(waitpid(0,&status,0)!=id);
+                     //   if()
+                        {while(waitpid(0,&status,0)!=id);}
                       nm++;        
                     continue;
                    }
@@ -210,9 +211,8 @@ else
                    printerror();
                     break; 
                  }
-
         }
-    
+  
   }
 
   printf("========\n");
