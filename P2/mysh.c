@@ -14,9 +14,11 @@ int n=write(STDERR_FILENO, error_message, strlen(error_message));
 if(n==-1)
 {
 printerror();
-//exit(0);
 }
 }
+
+
+
 
 void pwd()   //pwd func
 {
@@ -59,7 +61,11 @@ int main(int argc , char *argv[])   // main
 char * savepointer1;
 char * savepointer2;
 int id=0;
-int fd[2];
+int rpipe[2];
+
+int pipeon=0;
+int pstat;
+
 while(1)
 {
  printf("537sh> "); 
@@ -116,7 +122,7 @@ char * parse3=malloc(512);
 
 parse3=strncpy(parse3,parse,(strlen(parse)-1));
 
-//  int nm=0;
+
 if ((strchr(parse3,';')!=NULL))
 {  
   int nm=0;
@@ -153,21 +159,56 @@ int nm=0;
 pid_t status;
 while(nm<=(count-1) )
 {
-
+pipeon=0;
 
 int len=strlen(parse2[nm]);
 char * temp=malloc(len);
 temp=parse2[nm];
 
+
+
+if((strchr(temp,'|'))!=NULL )
+{
+pipeon=1;
+}
+
 char* tok3;
- 
+int picnt=0;
+int nt;
+for(nt=0;nt<strlen(parse2[nm]);nt++ )
+{
+if((strncmp(temp,"|",1))==0)
+{
+picnt++;
+}
+temp++;
+}
+temp=parse2[nm];
 
 
-    tok3=strtok_r(temp,"|",&savepointer1);
+if((strchr(parse,'|'))!=NULL )
+{
+pstat=pipe(rpipe);
+
+
+if (pstat==-1)
+{
+printerror();
+}
+}
+
+int pipecount=0;
+
+
+
+
+tok3=strtok_r(temp,"|",&savepointer1);
+
 
     while(tok3!=NULL)
 { 
- 
+//printf("%d\n",pipecount); 
+//int pipecount=0;
 
 char * toktmp=tok3;
 {
@@ -186,11 +227,11 @@ char * toktmp=tok3;
   argv[l]=NULL;
 }
 
-;
+
 tok3=strtok_r(NULL,"|",&savepointer1);
 
-  
-      
+
+  //PIPE    
  
    if(strncmp(argv[0],"quit",4) ==0)   // issue with quit have to give it twice sometimes
        {
@@ -216,42 +257,63 @@ else
 
               if(id==0)//child
                     {   
-                      
-               //   printf("id of child is: %d\n", getpid());                      
-                     execvp(argv[0],argv);
+          if(pipeon==1)        
+             {
+              if(pipecount != (picnt+1))  
+                  {
+                    if(pipecount==0)
+                    {
+                    dup2(rpipe[1],1);
+                    close(rpipe[0]);
+                    }
+
+
+                    else if(pipecount == picnt)
+                    {
+                    dup2(rpipe[0],0);
+                    close(rpipe[1]);
+                    }
+
+                    else
+                    {
+                    close(rpipe[1]);
+                    dup2(rpipe[0],STDIN_FILENO);
+                    close(rpipe[0]);
+                    dup2(rpipe[1],STDOUT_FILENO);
+                    }
+
+                  }
+             }
+                  
+                    execvp(argv[0],argv);
                      printerror();
                      exit(0);
                     }
         
 
                 else if(id>0) //parent
-                   {
-                  
-                 // printf("id of parent is: %d\n", getpid());                      
-                        
-                        if((strchr(parse,'+')==NULL))
-                        {(waitpid(-1,&status,0)!=getpid());                
-                        }
-
-                        else
+                   {    
+                        if((strchr(parse,'+')==NULL) && pipeon!=1)
                         {
-                              if((strchr(parse,'+')!=NULL)  && (nm==count-1) )
+                       (void)wait(NULL);
+                        //  (void)(waitpid(0,&status,0)!=getpid());                
+                        }
+                        
+                        
+                       else
+                        {
+                              if(((strchr(parse,'+')!=NULL)  && (nm==count-1)) && (pipeon!=1) )
                                   
                              {
-                               //printf("%d:%d\n",nm,count);
-                               int l;
-                                for(l=0;l<count;l++)
-                                {  (void) waitpid(0,&status,0);
-                                  }
-                             
+                                   
+                                  while ((id = wait(&status)) != -1);
+                                 
                              }               
-                        
                         }
+            
 
-
-                   //      {while(waitpid(-1,&status,0)!=id);}                
+                     
                    }
-                   
                else
                  { 
                    printerror();
@@ -260,11 +322,21 @@ else
                  }
         }
 
+
+if(pipeon==1 )
+{pipecount++;
+//while ((id = wait(&status)) != -1);
+
+}
 }
 nm++;
-
+if((pipeon==1)   ) 
+{
+close(rpipe[0]);close(rpipe[1]);
+while ((id = wait(&status)) != -1);
 }
 
+}
 
 
 }
