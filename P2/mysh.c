@@ -4,6 +4,8 @@
 #include<unistd.h>
 #include<sys/types.h>
 #include<sys/wait.h>
+#include<errno.h>
+int extern errno;
 
 void printerror()      //error function
 {
@@ -12,6 +14,7 @@ int n=write(STDERR_FILENO, error_message, strlen(error_message));
 if(n==-1)
 {
 printerror();
+//exit(0);
 }
 }
 
@@ -53,10 +56,12 @@ if(w==-1)
 
 int main(int argc , char *argv[])   // main
 {
+char * savepointer1;
+char * savepointer2;
 int id=0;
+int fd[2];
 while(1)
 {
-   
  printf("537sh> "); 
   char* parse;
   parse=(char*)malloc(512*(sizeof(char)));
@@ -97,21 +102,17 @@ for(k=0;(k<(strlen(parse)+1));k++)                            // To find number 
     p++;
     q++;
   }
+
 }
 
   
 count++;
 
 
+
 char* argv[8];
-
-
 char * parse2[count];
 char * parse3=malloc(512);
-//parse2[nm]=strncpy(parse2[nm],parse,(strlen(parse)-1));
-//int nm=0;
-//while(nm<=count)
-
 
 parse3=strncpy(parse3,parse,(strlen(parse)-1));
 
@@ -132,8 +133,8 @@ if ((strchr(parse3,';')!=NULL))
 else if((strchr(parse3,'+')!=NULL))
 {
 
- int nm=0;
- // int nm=0;
+  int nm=0;
+ 
   tok=strtok(parse3,"+");
     while(tok!=NULL)
     {
@@ -146,26 +147,47 @@ else if((strchr(parse3,'+')!=NULL))
 else
 {  parse2[0]=parse3;  }
 
-//printf("%d\n",count);
 
 int nm=0; 
-//while lop required here
+
+pid_t status;
 while(nm<=(count-1) )
 {
 
-  printf("========\n");
+
+int len=strlen(parse2[nm]);
+char * temp=malloc(len);
+temp=parse2[nm];
+
+char* tok3;
+ 
+
+
+    tok3=strtok_r(temp,"|",&savepointer1);
+
+    while(tok3!=NULL)
+{ 
+ 
+
+char * toktmp=tok3;
 {
   int l=0;
-  tok=strtok(parse2[nm]," ");   // Actual parsing to find arguments
+  tok=strtok_r(toktmp," ",&savepointer2);   // Actual parsing to find arguments
+
+
   while(tok!=NULL)    
-  {
+ {
+
+
   argv[l]=strdup(tok);
-  tok=strtok(NULL," ");
+  tok=strtok_r(NULL," ",&savepointer2);
   l++;
     }
   argv[l]=NULL;
 }
-//printf("%s\n",parse);
+
+;
+tok3=strtok_r(NULL,"|",&savepointer1);
 
   
       
@@ -178,52 +200,73 @@ while(nm<=(count-1) )
    else if(strncmp(argv[0],"pwd",3)==0)  
         {
         pwd();
+        break;
         }
 
   else if (strncmp(argv[0],"cd",2)==0)
           {
-          cd(argv);          
+          cd(argv);
+          break;
           }
          
 else 
        {      
          id=fork();
+
+
               if(id==0)//child
                     {   
                       
+               //   printf("id of child is: %d\n", getpid());                      
                      execvp(argv[0],argv);
                      printerror();
+                     exit(0);
                     }
         
 
                 else if(id>0) //parent
                    {
                   
-                        pid_t status;
-                      
-                        if((strchr(parse,'+')==NULL))
-                        {while(waitpid(0,&status,0)!=id);}
+                 // printf("id of parent is: %d\n", getpid());                      
                         
-                      nm++;        
-                    
-                    
-           //         continue;
-                      
+                        if((strchr(parse,'+')==NULL))
+                        {(waitpid(-1,&status,0)!=getpid());                
+                        }
 
+                        else
+                        {
+                              if((strchr(parse,'+')!=NULL)  && (nm==count-1) )
+                                  
+                             {
+                               //printf("%d:%d\n",nm,count);
+                               int l;
+                                for(l=0;l<count;l++)
+                                {  (void) waitpid(0,&status,0);
+                                  }
+                             
+                             }               
+                        
+                        }
+
+
+                   //      {while(waitpid(-1,&status,0)!=id);}                
                    }
+                   
                else
                  { 
                    printerror();
-                    break; 
+                    exit(0);
+
                  }
         }
-  
-  }
-pid_t status;
-if((strchr(parse,'+')!=NULL))
-{while(waitpid(0,&status,0)!=id);}
-  // printf("========\n");
-//continue;
-   }
+
+}
+nm++;
+
+}
+
+
+
+}
 return 0;
 }
