@@ -5,6 +5,9 @@
 #include<sys/types.h>
 #include<sys/wait.h>
 #include<errno.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+
 int extern errno;
 
 void printerror()      //error function
@@ -62,9 +65,10 @@ char * savepointer1;
 char * savepointer2;
 int id=0;
 int rpipe[2];
-
+int fileon=0;
 int pipeon=0;
 int pstat;
+
 
 while(1)
 {
@@ -160,7 +164,7 @@ pid_t status;
 while(nm<=(count-1) )
 {
 pipeon=0;
-
+fileon=0;
 int len=strlen(parse2[nm]);
 char * temp=malloc(len);
 temp=parse2[nm];
@@ -199,16 +203,39 @@ printerror();
 
 int pipecount=0;
 
+//char * temp1;
+char* temp1[2];
 
 
+if ((strchr(temp,'>'))!=NULL)
+{
+ int cnt=0; 
+char * savepointer3;
+temp1[cnt]=strtok_r(temp,">",&savepointer3);
 
-tok3=strtok_r(temp,"|",&savepointer1);
+while(temp1[cnt]!=NULL)
+{
+cnt++;
+temp1[cnt]=strtok_r(NULL,">",&savepointer3);
+
+}
+
+fileon=1;
+}
+
+else
+{
+temp1[0]=temp;
+}
+
+//printf(" da:  %s : %s \n",temp1[0],temp);
+
+
+tok3=strtok_r(temp1[0],"|",&savepointer1);
 
 
     while(tok3!=NULL)
 { 
-//printf("%d\n",pipecount); 
-//int pipecount=0;
 
 char * toktmp=tok3;
 {
@@ -229,7 +256,6 @@ char * toktmp=tok3;
 
 
 tok3=strtok_r(NULL,"|",&savepointer1);
-
 
   //PIPE    
  
@@ -284,6 +310,19 @@ else
 
                   }
              }
+
+
+                if(fileon==1)
+                {
+//                   printf("%s\n",temp1[1]);
+
+                      temp1[1]= strtok(temp1[1]," ");
+
+                   printf("%s\n",temp1[1]);
+
+                      close(STDOUT_FILENO);
+                      open(temp1[1],O_CREAT | O_WRONLY | O_TRUNC,S_IRWXU);
+                }
                   
                     execvp(argv[0],argv);
                      printerror();
