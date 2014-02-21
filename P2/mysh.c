@@ -494,14 +494,18 @@ char * toktmp=tok3;
 
 
 tok3=strtok_r(NULL,"|",&savepointer1);
+int argzero=0;
+  //PIPE   
+  if (argv[0]==NULL)
+{
+argzero =1;
+}
 
-  //PIPE    
- 
-   if(strncmp(argv[0],"quit",4) ==0)   // issue with quit have to give it twice sometimes
-       {
+if((strncmp(argv[0],"quit",4) ==0) && (argzero ==0))   // issue with quit have to give it twice sometimes
+    {
       
           
-     if((strchr(parse,'+')==NULL))
+     if((strchr(parse,'+')==NULL) )
      { //quit=1;
        exit(0);
 
@@ -517,10 +521,9 @@ tok3=strtok_r(NULL,"|",&savepointer1);
      {printerror();
      }
        
+    }      
        
-       }
-
-   else if(strncmp(argv[0],"pwd",3)==0)  
+   else if((strncmp(argv[0],"pwd",3)==0) && (argzero==0)) 
         {
      
      if((strchr(parse,'+')==NULL))
@@ -543,7 +546,7 @@ tok3=strtok_r(NULL,"|",&savepointer1);
         break;
         }
 
-  else if (strncmp(argv[0],"cd",2)==0)
+  else if ((strncmp(argv[0],"cd",2)==0)&& (argzero==0))
           {
          
       
@@ -567,7 +570,7 @@ tok3=strtok_r(NULL,"|",&savepointer1);
           }
          
 else 
-   
+   argzero=0;
     {
          id=fork();
               if(id==0)//child
@@ -665,7 +668,7 @@ else
 
 if(pipeon==1 )
 {pipecount++;
- ((id = wait(&status)) != -1);
+while ((id = wait(&status)) != -1);
 }
 
 else
