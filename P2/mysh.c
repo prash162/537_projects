@@ -168,14 +168,16 @@ exit(0);
 iter=0;
 while(1)
 {
-//if(argc==1)
-// printf("537sh> "); 
+if(argc==1)
+ printf("537sh> "); 
 
  char* parse;
   parse=(char*)malloc(512*(sizeof(char)));
 
   if (parse==NULL)
   {printerror();}
+
+
 
 
 char * parse3=(char *)malloc(512);
@@ -186,15 +188,18 @@ if(parse3==NULL)
 
 if(argc==1)
 {
-
   parse=fgets(parse,512,stdin);
+
+
 if(parse == NULL)
 {
 printerror();
 }
+
  parse3=strncpy(parse3,parse,(strlen(parse)-1));
  parse3[strlen(parse)-1]= '\0';
 }
+
 
 else if(argc==2)
 {
@@ -260,7 +265,7 @@ for(k=0;(k<(strlen(parse)+1));k++)                            // To find number 
    { 
    count++;
    }
-    p++;
+  p++;
     q++;
   }
 
@@ -271,12 +276,14 @@ for(k=0;(k<(strlen(parse)+1));k++)                            // To find number 
   {
   count++;
   }
+  
+  
     p++;
     q++;
   }
 
 }
-;
+
   
 count++;
 
@@ -285,7 +292,7 @@ count++;
 char* argv[8];
 char * parse2[count];
 int mulissue=0;
-
+int counter=0;
 if((strchr(parse3,'+')!=NULL) && ((strchr(parse3,';')!=NULL)))
 {
 printerror();
@@ -318,11 +325,11 @@ exit(0);
 
     while(tok!=NULL)
     {
-		
     parse2[nm]=tok;
     tok=strtok(NULL,";");
     nm++;
     }
+counter=nm;
 }
 
 else if((strchr(parse3,'+')!=NULL))
@@ -337,6 +344,7 @@ else if((strchr(parse3,'+')!=NULL))
     tok=strtok(NULL,"+");
     nm++;
     }
+    counter=nm;
 }
 
 
@@ -349,19 +357,25 @@ exit(0);
 else
 {
   
-  parse2[0]=parse3;  }
+  parse2[0]=parse3; 
+counter=1;
+}
 
 
 int nm=0; 
 
 pid_t status;
-
-while(nm<=(count-1) )
+while(nm<(counter) )
 {
 
   pipeon=0;
 fileon=0;
-int len=strlen(parse2[nm]);
+int len;
+
+if (parse2[nm] !=NULL)
+ len=strlen(parse2[nm]);
+else
+len =0;
 
 char * temp=(char*)malloc(len*(sizeof(char)));
 
@@ -474,23 +488,37 @@ printerror();
 
 }
 
+
+
+
+
  
 char * toktmp=tok3;
 {
   int l=0;
-  tok=strtok_r(toktmp,"	 ",&savepointer2);   // Actual parsing to find arguments
+
+          
+  tok=strtok_r(toktmp,"\" 	",&savepointer2);   // Actual parsing to find arguments
 
   while(tok!=NULL)    
- {
-
+  {
+  
 
   argv[l]=strdup(tok);
  
- tok=strtok_r(NULL,"	 ",&savepointer2);
+ tok=strtok_r(NULL,"\" 	",&savepointer2);
   l++;
     }
   argv[l]=NULL;
 }
+
+
+
+
+
+
+
+
 
 
 tok3=strtok_r(NULL,"|",&savepointer1);
@@ -499,9 +527,10 @@ int argzero=0;
   if (argv[0]==NULL)
 {
 argzero =1;
+argv[0]=strdup(" ");
 }
 
-if((strncmp(argv[0],"quit",4) ==0) && (argzero ==0))   // issue with quit have to give it twice sometimes
+if((strncmp(argv[0],"quit",4) ==0))   // issue with quit have to give it twice sometimes
     {
       
           
@@ -523,7 +552,7 @@ if((strncmp(argv[0],"quit",4) ==0) && (argzero ==0))   // issue with quit have t
        
     }      
        
-   else if((strncmp(argv[0],"pwd",3)==0) && (argzero==0)) 
+   else if((strncmp(argv[0],"pwd",3)==0)) 
         {
      
      if((strchr(parse,'+')==NULL))
@@ -546,7 +575,7 @@ if((strncmp(argv[0],"quit",4) ==0) && (argzero ==0))   // issue with quit have t
         break;
         }
 
-  else if ((strncmp(argv[0],"cd",2)==0)&& (argzero==0))
+  else if ((strncmp(argv[0],"cd",2)==0))
           {
          
       
@@ -570,7 +599,7 @@ if((strncmp(argv[0],"quit",4) ==0) && (argzero ==0))   // issue with quit have t
           }
          
 else 
-   argzero=0;
+   
     {
          id=fork();
               if(id==0)//child
@@ -592,7 +621,7 @@ else
                 if((fileon==1)  && ( picount == ipipe))
                 { 
 
-                      temp1[1]= strtok(temp1[1]," ");
+                      temp1[1]= strtok(temp1[1]," 	");
 
 
                       close(STDOUT_FILENO);
@@ -602,7 +631,17 @@ else
 					{ printerror();}
 				               
  }
+                    if(argzero==1)
+                   {
+                
+                      argv[0]=NULL;
+                
+                   }
+
+                    
                   if ((mulissue!=1) &&  (filerr!=1)  ){
+
+
                     execvp(argv[0],argv);
                     printerror();}
 
